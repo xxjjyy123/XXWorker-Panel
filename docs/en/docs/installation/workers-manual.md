@@ -1,4 +1,6 @@
-# :material-new-box:{ .md .middle } Installation via Cloudflare Workers
+# :material-new-box:{ .md .middle } Workers manual installation
+
+It is highly recommended to use [Wizard installation](./wizard.md) to avoid Cloudflare 1101 error, user errors and also save time to setup panel.
 
 ## Installation
 
@@ -10,14 +12,14 @@ If you don’t have a Cloudflare account, create one [here](https://dash.cloudfl
 
 First, download the Worker code from [here](https://github.com/bia-pain-bache/BPB-Worker-Panel/releases/latest/download/worker.js).
 
-In your Cloudflare account, navigate to the `Compute (Workers)` > `Workers & Pages` section in the left menu, click `Create`, and select `Workers` and then `Start with Hello World!` > `Get started`.
+In your Cloudflare account, navigate to the `Developer Platform` tab and click `Create application`, from `Workers` tab find `Start with Hello World!` and `Get started`.
 
 Enter a desired name, which will form your panel’s domain and `Deploy`.
 
 !!! danger
     Choose a name that does not include the word `bpb`, as this may trigger Cloudflare’s detection and result in a `1101` error.
 
-Then click `Edit` here. In the left sidebar, delete the `worker.js` file and upload the new one. If it gives an error, delete the `package-lock.json` file too. Since the code has become large, copying and pasting on mobile is difficult — refer to the image below and upload it properly. On mobile, open the side menu, long-press the Explorer, and click `Upload...`.
+Then click `Edit code` here. In the left sidebar, delete the `worker.js` file and upload the new one. If it gives an error, delete the `package-lock.json` file too. Since the code has become large, copying and pasting on mobile is difficult — refer to the image below and upload it properly. On mobile, open the side menu, long-press the Explorer, and click `Upload...`.
 
 ![Mobile upload](../images/worker-mobile-upload.jpg)
 
@@ -42,13 +44,13 @@ From here, go to the `KV` page:
 
 In the KV section, click `Create`, give it a name (e.g., Test), and click `Add`.
 
-Again, go to the `Workers & Pages` section from the sidebar, open the Worker you created, go to `Settings`, and find `Bindings`. Click `Add` and choose `KV Namespace`. From the dropdown, select the KV you just created (e.g., Test). What’s important is the first field — it **must** be set to `kv`. Then click `Deploy`.
+Again, go to the `Developer Platform` section, open the Worker you just created, go to `Bindings`. Click `Add binding` and choose `KV Namespace`. From the dropdown, select the KV you just created (e.g., Test). What’s important is the first field — it **must** be set to `kv`. Then click `Deploy`.
 
 ![Bind KV](../images/bind-kv.jpg)
 
-### 4. Set UUID and Trojan password
+### 4. Set UUID, Trojan password and Subscription path
 
-Still in `Settings`, you'll see a section called `Variables and Secrets`. Click `Add`, enter `UUID` (in uppercase) as the `Variable name`, paste the UUID **Secrets generator** into the Value field, click `+ Add variable` and set `Variable name` to `TR_PASS` (uppercase), get the Trojan password from **Secrets generator**, then `Deploy`.
+Click `Copy all` from the `Secrets generator` page provided earlier, In Cloudflare dashboard go to `Settings` section, locate the `Variables and Secrets` section. Click `Add` and paste into the `Variable name` field and click `Deploy`. This will automatically add these 3 parameters to panel.
 
 Again click `Visit` in your worker dashboard, you see speedtest in browser, just add `/panel` to the end of address and see your panel:
 
@@ -83,6 +85,27 @@ https://www.nslookup.io/domains/bpb.yousef.isegaro.com/dns-records/
     To use multiple Proxy IPs, enter them comma-separated.
     ```title="Example"
     151.213.181.145, 5.163.51.41, bpb.yousef.isegaro.com
+    ```
+
+Enter the IPs in the `Value` field and click `Deploy`.
+
+### Fixing the NAT64 Prefixes
+
+By default, the code uses multiple NAT64 prefixes randomly, assigning a new random prefix for each connection to Cloudflare addresses (covering much of the web). This IP rotation may cause issues, particularly for traders. From version 3.4.2 onward, you can change the prefixes via the panel and update the subscription. However, the method below is recommended:
+
+!!! note
+    Changing the NAT64 prefixes via the panel requires updating the subscription if the IP stops working, which can disrupt donated configurations, as users without an active subscription cannot update them. Use this method only for personal use. Other methods don’t require subscription updates.
+
+In the project’s `Settings` section, open `Variables and Secrets`, click `Add` and enter `NAT64_PREFIX` (in capital letters) in the first box. Obtain IPs from the following link, which lists IPs from various regions and ISPs:
+
+```text
+https://github.com/bia-pain-bache/BPB-Worker-Panel/blob/main/NAT64Prefixes.md
+```
+
+!!! info
+    To use multiple IPs, fill them comma-separated.
+    ```title="Example"
+    [2602:fc59:b0:64::], [2602:fc59:11:64::]
     ```
 
 Enter the IPs in the `Value` field and click `Deploy`.
